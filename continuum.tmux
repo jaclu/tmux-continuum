@@ -45,7 +45,7 @@ add_resurrect_save_interpolation() {
 
 just_started_tmux_server() {
 	local tmux_start_time
-	tmux_start_time="$(tmux display-message -p -F '#{start_time}')"
+	tmux_start_time="$($TMUX_BIN display-message -p -F '#{start_time}')"
 	local restore_max_delay
 	restore_max_delay="$(get_tmux_option "$auto_restore_max_delay_option" "${auto_restore_max_delay_default}")"
 	[ "$tmux_start_time" == "" ] || [ "$tmux_start_time" -gt "$(($(date +%s)-${restore_max_delay}))" ]
