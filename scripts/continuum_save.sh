@@ -53,11 +53,12 @@ acquire_lock() {
 }
 
 should_this_be_run() {
-	# This script may be triggered frequently, as often as every 10 seconds or less.
-	# On slower systems, this frequent execution can cause noticeable delays, as
-	# the script performs substantial processing that might take up to a second.
+	# This script may be triggered frequently, potentially every 5 seconds or less,.
+	# On slower systems, this frequent execution can lead to noticeable delays
+	# due to the script’s substantial processing requirements.
 	# To improve responsiveness and reduce system load, a timestamp file is used
-	# to limit full processing to once per minute.
+	# to limit full processing to once per minute. This approach roughly reduces
+	# the runtime by a factor of four.
 	local f_next_check_timestamp="$CURRENT_DIR/next_check.timestamp"
 	local t_now
 	t_now="$(current_timestamp)"
@@ -66,14 +67,14 @@ should_this_be_run() {
 		read -r next_check <"$f_next_check_timestamp" # Using read instead of cat for efficiency
 		# Check if the timestamp file contains a valid timestamp (positive integer)
 		if [[ -n "$next_check" && "$next_check" =~ ^[0-9]+$ ]]; then
-			[ "$t_now" -lt "$next_check" ] && return
+			[ "$t_now" -lt "$next_check" ] && exit 0
 		fi
 	}
 	echo "$((t_now + 60))" >"$f_next_check_timestamp"
 }
 
 main() {
-        should_this_be_run
+	should_this_be_run
 
 	if supported_tmux_version_ok && auto_save_not_disabled && enough_time_since_last_run_passed && acquire_lock; then
 		fetch_and_run_tmux_resurrect_save_script
