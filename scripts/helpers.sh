@@ -1,14 +1,3 @@
-#
-#  I use an env var TMUX_BIN to point at the used tmux, defined in my
-#  tmux.conf, in order to pick the version matching the server running,
-#  or when the tmux bin is in fact tmate :)
-#  If not found, it is set to whatever is in PATH, so should have no negative
-#  impact. In all calls to tmux I use $TMUX_BIN instead in the rest of this
-#  plugin.
-#
-[ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
-
-
 get_tmux_option() {
 	local option="$1"
 	local default_value="$2"
@@ -29,15 +18,17 @@ set_tmux_option() {
 # multiple tmux server detection helpers
 
 current_tmux_server_pid() {
-	echo "$TMUX_BIN" |
+	echo "$TMUX" |
 		cut -f2 -d","
 }
 
 all_tmux_processes() {
+	# Only considering those using the current tmux binary, if other tmuxes
+	# are used, they can be ignored for this.
 	# ignores `tmux source-file .tmux.conf` command used to reload tmux.conf
 	local user_id=$(id -u)
 	ps -u $user_id -o "command pid" |
-		\grep "^tmux" |
+		\grep "^$TMUX_BIN" |
 		\grep -v "^$TMUX_BIN source"
 }
 

@@ -1,5 +1,12 @@
 SUPPORTED_VERSION="1.9"
 
+# The environment variable TMUX_BIN is used to specify the tmux binary.
+# It should be defined in tmux.conf to ensure compatibility with the tmux
+# server version or to use tmate if applicable. If TMUX_BIN is not set,
+# the script defaults to the tmux binary found in PATH, avoiding any negative
+# impact. All references to tmux within this plugin should utilize $TMUX_BIN.
+[ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
+
 # these tmux options contain paths to tmux resurrect save and restore scripts
 resurrect_save_path_option="@resurrect-save-script-path"
 resurrect_restore_path_option="@resurrect-restore-script-path"
