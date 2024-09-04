@@ -52,13 +52,13 @@ acquire_lock() {
 	return 1 # Someone else has the lock.
 }
 
-main() {
+should_this_be_run() {
 	# This script may be triggered frequently, as often as every 10 seconds or less.
 	# On slower systems, this frequent execution can cause noticeable delays, as
 	# the script performs substantial processing that might take up to a second.
 	# To improve responsiveness and reduce system load, a timestamp file is used
 	# to limit full processing to once per minute.
-	local f_next_check_timestamp="$CURRENT_DIR/continuum_next_check.timestamp"
+	local f_next_check_timestamp="$CURRENT_DIR/next_check.timestamp"
 	local t_now
 	t_now="$(current_timestamp)"
 	[ -f "$f_next_check_timestamp" ] && {
@@ -70,6 +70,10 @@ main() {
 		fi
 	}
 	echo "$((t_now + 60))" >"$f_next_check_timestamp"
+}
+
+main() {
+        should_this_be_run
 
 	if supported_tmux_version_ok && auto_save_not_disabled && enough_time_since_last_run_passed && acquire_lock; then
 		fetch_and_run_tmux_resurrect_save_script
