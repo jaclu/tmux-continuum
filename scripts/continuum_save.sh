@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TMPDIR="${TMPDIR:-/tmp}"
 
 source "$CURRENT_DIR/helpers.sh"
 source "$CURRENT_DIR/variables.sh"
@@ -37,7 +38,7 @@ fetch_and_run_tmux_resurrect_save_script() {
 acquire_lock() {
 	# Sometimes tmux starts multiple saves in parallel. We want only one
 	# save to be running, otherwise we can get corrupted saved state.
-	local lockdir_prefix="/tmp/tmux-continuum-$(current_tmux_server_pid)-lock-"
+	local lockdir_prefix="$TMPDIR/tmux-continuum-$(current_tmux_server_pid)-lock-"
 	# The following implements a lock that auto-expires after 100...200s.
 	local lock_generation=$(($(date +%s) / 100))
 	local lockdir1="${lockdir_prefix}${lock_generation}"
